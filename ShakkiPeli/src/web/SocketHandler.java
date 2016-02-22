@@ -39,7 +39,12 @@ public class SocketHandler {
     //Target into which messages will be pushed
     volatile ObservableList<String> target;
     
-    SocketHandler( boolean server, ObservableList<String> target ){
+    //Return whether socket is open
+    public boolean isConnected(){
+        return (socket != null);
+    }
+    
+    public SocketHandler( boolean server, ObservableList<String> target ){
         
         //Set target
         this.target = target;
@@ -54,8 +59,10 @@ public class SocketHandler {
      * @param port Server port
      */
     public void initServer( int port ){
+        System.out.println("Starting serversocket...");
         try{
             serverSocket = new ServerSocket(port);
+            System.out.println("Server succesfully initialized");
         }catch( IOException e ){
             System.err.println("Server couldn't be initialized, check port");
             e.printStackTrace();

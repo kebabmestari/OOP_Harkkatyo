@@ -5,6 +5,8 @@
  */
 package shakkipeli;
 
+import shakkipeli.exceptions.InvalidCoordinates;
+
 /**
  * Class for each of the game pieces, their status, methods etc
  * @author Samuel
