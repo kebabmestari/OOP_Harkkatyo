@@ -195,11 +195,9 @@ public class ShakkiPeli extends Application {
         primaryStage.setScene(mainScene);
         primaryStage.setTitle("Java Chess for OOP");
         
-        //Keep the window ratio
-        primaryStage.minWidthProperty().bind(mainScene.widthProperty());
-        primaryStage.minHeightProperty().bind(mainScene.heightProperty());
-        
         primaryStage.setOnCloseRequest( (e) -> {shutDown();});
+        primaryStage.setMinWidth(primaryStage.getWidth());
+        primaryStage.setMinHeight(primaryStage.getHeight());
         
         primaryStage.show();
         

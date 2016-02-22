@@ -7,11 +7,9 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.TilePane;
+import shakkipeli.Board;
 
 import shakkipeli.ShakkiPeli;
 
@@ -44,30 +42,8 @@ public class MainController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         
-        //Create board dynamically
-        TilePane board = new TilePane(0, 0);
-        board.setPrefColumns(8);
-        board.setPrefRows(8);
+        Board.createBoard(gameView);
         
-        gameView.getChildren().add(board);
-
-        int i = 0;
-        
-        for( int y = 0; y < 8; y++){
-            for( int x = 0; x < 8; x++ ){
-                Pane ruutu = new Pane();
-
-                ruutu.setPrefSize((int)(gameView.getPrefWidth()/8), (int)(gameView.getPrefHeight()/8));
-
-                if( (i % 2) == 0 )
-                    ruutu.setStyle("-fx-background-color: black;");
-                else
-                    ruutu.setStyle("-fx-background-color: white");
-                board.getChildren().add(ruutu);
-                i++;
-            }
-            i++;
-        }
     }      
     
     /**

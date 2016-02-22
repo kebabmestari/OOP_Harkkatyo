@@ -16,7 +16,11 @@ public class Piece {
     //Type of the piece
     PieceType type;
     
-    boolean valid;
+    //Owner of this piece
+    private int owner;
+    
+    private int x;
+    private int y;
     
     public Piece( PieceType type, int x, int y ) throws InvalidCoordinates{
         
@@ -26,6 +30,21 @@ public class Piece {
         this.type = type;
         
         System.out.println("Piece " + type.toString() + " created at " + x + "," + y);
+        
+    }
+    
+    /**
+     * Calls the rendering methods
+     */
+    public void draw(){
+        
+    }
+    
+    /**
+     * Generate all the pieces needed for the game
+     * 
+     */
+    public static void createPieces(){
         
     }
     

@@ -14,7 +14,6 @@ public class Move implements Serializable{
     //Results of a move
     private ArrayList<Result> resultset;
     
-    
     public Move(){
         System.out.println("Move instance created");
         resultset = new ArrayList<Result>();
