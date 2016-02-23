@@ -1,10 +1,13 @@
-package web;
+package com.lindqvist.shakkipeli.web;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.*;
@@ -28,23 +31,25 @@ public class SocketHandler {
     InputStream in;
     OutputStream out;
     
-    BufferedReader buf_in;
-    BufferedWriter buf_out;
+    BufferedInputStream buf_in;
+    BufferedOutputStream buf_out;
     
-    PrintWriter pri_out;
+    //Streams for sending objects
+    ObjectOutputStream obj_out;
+    ObjectInputStream obj_in;
     
     //Thread pool executor
     ExecutorService executor;
     
     //Target into which messages will be pushed
-    volatile ObservableList<String> target;
+    volatile ObservableList<Message> target;
     
     //Return whether socket is open
     public boolean isConnected(){
         return (socket != null);
     }
     
-    public SocketHandler( boolean server, ObservableList<String> target ){
+    public SocketHandler( boolean server, ObservableList<Message> target ){
         
         //Set target
         this.target = target;
@@ -79,8 +84,12 @@ public class SocketHandler {
                 try{
                     
                     socket = serverSocket.accept();
-                    in = socket.getInputStream();
-                    out = socket.getOutputStream();
+                    in       = socket.getInputStream();
+                    out      = socket.getOutputStream();
+                    buf_in   = new BufferedInputStream( in );
+                    buf_out  = new BufferedOutputStream( out );
+                    obj_in   = new ObjectInputStream( buf_in );
+                    obj_out  = new ObjectOutputStream( buf_out );
                     
                     System.out.println("Client " + socket.getInetAddress() + "connected");
                 }catch( IOException e ){
@@ -102,8 +111,12 @@ public class SocketHandler {
         try{
             
            socket = new Socket( host, port );
-           in = socket.getInputStream();
-           buf_in = new BufferedReader( new InputStreamReader( in ) );
+           in       = socket.getInputStream();
+           out      = socket.getOutputStream();
+           buf_in   = new BufferedInputStream( in );
+           buf_out  = new BufferedOutputStream( out );
+           obj_in   = new ObjectInputStream( buf_in );
+           obj_out  = new ObjectOutputStream( buf_out );
            
            System.out.println("Connected to "  +
                    socket.getInetAddress()+":" +
@@ -124,14 +137,19 @@ public class SocketHandler {
         
         if( socket != null && buf_in != null ){
             executor.submit( () -> {
-                try{
-                    String temp;
-                    while( (temp = buf_in.readLine()) != null ){
-                        target.add(temp);
-                        System.out.println("Message received");
+                while(true){
+                    try{
+                        Message temp;
+                        while( (temp = (Message)obj_in.readObject()) != null ){
+                            target.add(temp);
+                            System.out.println("Message received");
+                        }
+                    }catch( IOException e ){
+                        e.printStackTrace();
+                    }catch( ClassNotFoundException e ){
+                        System.err.println("Invalid class in communication");
+                        e.printStackTrace();
                     }
-                }catch( IOException e ){
-                    e.printStackTrace();
                 }
             });
         }
@@ -159,7 +177,6 @@ public class SocketHandler {
         
         super.finalize();
         
-        if( pri_out != null )   pri_out.close();
         if( buf_in != null )    buf_in.close();
         if( buf_out != null )   buf_out.close();
         

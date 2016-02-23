@@ -1,4 +1,4 @@
-package controller;
+package com.lindqvist.shakkipeli.controller;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -9,9 +9,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.TilePane;
-import shakkipeli.Board;
-
-import shakkipeli.ShakkiPeli;
+import com.lindqvist.shakkipeli.shakkipeli.Board;
+import com.lindqvist.shakkipeli.shakkipeli.ShakkiPeli;
 
 /**
  * Controller of MVC architecture

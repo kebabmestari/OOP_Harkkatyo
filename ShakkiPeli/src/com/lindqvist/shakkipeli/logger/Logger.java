@@ -1,4 +1,4 @@
-package logger;
+package com.lindqvist.shakkipeli.logger;
 
 import javafx.scene.control.TextArea;
 

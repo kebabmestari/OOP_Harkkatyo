@@ -1,4 +1,4 @@
-package shakkipeli.exceptions;
+package com.lindqvist.shakkipeli.shakkipeli.exceptions;
 
 /**
  * Exception thrown in case of invalid piece coordinates

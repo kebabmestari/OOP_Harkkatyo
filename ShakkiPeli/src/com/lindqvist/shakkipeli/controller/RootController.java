@@ -1,4 +1,4 @@
-package controller;
+package com.lindqvist.shakkipeli.controller;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -9,7 +9,7 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
 
-import shakkipeli.ShakkiPeli;
+import com.lindqvist.shakkipeli.shakkipeli.ShakkiPeli;
 
 /**
  * Controller of MVC architecture

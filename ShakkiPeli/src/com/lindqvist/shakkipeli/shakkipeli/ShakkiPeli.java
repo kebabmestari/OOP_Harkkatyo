@@ -4,10 +4,10 @@
  * Samuel Lindqvist
  * Started. 21.2.2016
 */
-package shakkipeli;
+package com.lindqvist.shakkipeli.shakkipeli;
 
-import controller.MainController;
-import controller.RootController;
+import com.lindqvist.shakkipeli.controller.MainController;
+import com.lindqvist.shakkipeli.controller.RootController;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -27,7 +27,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
-import web.SocketHandler;
+import com.lindqvist.shakkipeli.web.SocketHandler;
 
 /**
  * The main class

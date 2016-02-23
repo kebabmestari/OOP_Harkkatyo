@@ -1,4 +1,4 @@
-package shakkipeli;
+package com.lindqvist.shakkipeli.shakkipeli;
 
 /**
  * Different pawn types

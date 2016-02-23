@@ -1,7 +1,8 @@
-package web;
+package com.lindqvist.shakkipeli.web;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 /**
  * Class which encloses information about move
@@ -9,17 +10,17 @@ import java.util.ArrayList;
  * Transferred through internet
  * @author Samuel
  */
-public class Move implements Serializable{
+public class Message implements Serializable{
     
     //Results of a move
-    private ArrayList<Result> resultset;
+    private LinkedList<Result> resultset;
     
-    public Move(){
-        System.out.println("Move instance created");
-        resultset = new ArrayList<Result>();
+    public Message(){
+        System.out.println("Message instance created");
+        resultset = new LinkedList<>();
     }
     
-    public void setResultset( ArrayList<Result> results ){
+    public void setResultset( LinkedList<Result> results ){
         resultset = results;
     }
     
@@ -53,7 +54,7 @@ public class Move implements Serializable{
         return (resultset.size() > 0);
     }
     
-    public ArrayList<Result> getResultset(){
+    public LinkedList<Result> getResultset(){
         return resultset;
     }
     

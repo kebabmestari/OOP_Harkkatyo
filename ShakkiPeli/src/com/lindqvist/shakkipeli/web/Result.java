@@ -1,7 +1,6 @@
-package web;
+package com.lindqvist.shakkipeli.web;
 
 import java.io.Serializable;
-import shakkipeli.Piece;
 
 /**
  * Beans class for storing results of moves
@@ -11,7 +10,7 @@ import shakkipeli.Piece;
 public class Result implements Serializable {
 
     //Target piece of this result
-    private Piece target;
+    private String target;
 
     //Type of this action
     private ResultType type;
@@ -23,16 +22,17 @@ public class Result implements Serializable {
     public Result() {
     }
     
-    public Result( Piece target, ResultType type ){
-        setTargetPiece(target);
+    public Result( String target, ResultType type ){
+        setTarget(target);
         setResultType(type);
+        System.out.println("Created result instance of type " + type.toString() + " for " +  target);
     }
     
-    public void setTargetPiece( Piece target ){
+    public void setTarget( String target ){
         this.target = target;
     }
     
-    public Piece getTargetPiece(){
+    public String getTarget(){
         return target;
     }
     
