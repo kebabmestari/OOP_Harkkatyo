@@ -8,6 +8,7 @@ package com.lindqvist.shakkipeli.shakkipeli;
 
 import com.lindqvist.shakkipeli.controller.MainController;
 import com.lindqvist.shakkipeli.controller.RootController;
+import com.lindqvist.shakkipeli.web.Message;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -23,7 +24,6 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.TextArea;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
@@ -116,7 +116,7 @@ public class ShakkiPeli extends Application {
     public void joinGame(String connectString){
         socketHandler = new SocketHandler(false, null);
         
-        Pattern r = Pattern.compile("([a-z1-9]+):([1-9]+)");
+        Pattern r = Pattern.compile("([a-z0-9\\.]+):([0-9]+)");
         Matcher m = r.matcher( connectString );
         
         String host = null;
@@ -133,9 +133,20 @@ public class ShakkiPeli extends Application {
                 else
                     System.err.println("Failed to connect");
             }
+        
         }
-            
+        controller.disableConnect();
+        controller.setLabel("CONNECTED");
+        
         isServer = false;
+    }
+    
+    /**
+     * Call sockethandler to send a message
+     * @param message The Message instance to be sent
+     */
+    public void sendMessage(Message message){
+        socketHandler.sendMessage(message);
     }
     
     /**
@@ -150,6 +161,9 @@ public class ShakkiPeli extends Application {
         
         socketHandler.initServer(port);
         socketHandler.listenToClients();
+        
+        controller.disableConnect();
+        controller.setLabel("CONNECTED");
         
         isServer = true;
     }
@@ -166,13 +180,15 @@ public class ShakkiPeli extends Application {
         try{
             
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation( ShakkiPeli.class.getClassLoader().getResource("view/root.fxml") );
+            loader.setLocation( ShakkiPeli.class.getClassLoader().getResource(
+                    "com/lindqvist/shakkipeli/view/root.fxml") );
             root = (BorderPane)loader.load();
             rcontroller = (RootController)loader.getController();
             rcontroller.setMainApp(this);
             
             loader = new FXMLLoader();
-            loader.setLocation( ShakkiPeli.class.getClassLoader().getResource("view/main.fxml") );
+            loader.setLocation( ShakkiPeli.class.getClassLoader().getResource(
+                    "com/lindqvist/shakkipeli/view/main.fxml") );
             root.setCenter( (AnchorPane)loader.load() );
             controller = (MainController)loader.getController();
             controller.setMainApp(this);
@@ -184,12 +200,12 @@ public class ShakkiPeli extends Application {
             shutDown();
         }
         
+        
         //Initialize logger
         //initOutput();
         
         //Create main scene from root node
         mainScene = new Scene(root);
-        
         
         //Set scene and make it visible
         primaryStage.setScene(mainScene);

@@ -2,17 +2,16 @@ package com.lindqvist.shakkipeli.web;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.net.*;
 import java.util.concurrent.*;
+import javafx.beans.value.ObservableBooleanValue;
 import javafx.collections.ObservableList;
+import javafx.util.Duration;
 
 /**
  * SocketHandler
@@ -23,26 +22,28 @@ import javafx.collections.ObservableList;
 public class SocketHandler {
     
     //Socket used for listening clients
-    ServerSocket serverSocket;
+    private volatile ServerSocket serverSocket;
     //Socket used to communicate with remote host
-    Socket socket;
+    private volatile Socket socket;
     
     //Streams
-    InputStream in;
-    OutputStream out;
+    private InputStream in;
+    private OutputStream out;
     
-    BufferedInputStream buf_in;
-    BufferedOutputStream buf_out;
+    ObservableBooleanValue isConnected;
+    
+    private BufferedInputStream buf_in;
+    private BufferedOutputStream buf_out;
     
     //Streams for sending objects
-    ObjectOutputStream obj_out;
-    ObjectInputStream obj_in;
+    private ObjectOutputStream obj_out;
+    private ObjectInputStream obj_in;
     
     //Thread pool executor
-    ExecutorService executor;
+    private ExecutorService executor;
     
     //Target into which messages will be pushed
-    volatile ObservableList<Message> target;
+    private volatile ObservableList<Message> target;
     
     //Return whether socket is open
     public boolean isConnected(){
@@ -83,15 +84,19 @@ public class SocketHandler {
         executor.submit( () -> {
                 try{
                     
+                    System.out.println("Listening to clients");
+                    
                     socket = serverSocket.accept();
-                    in       = socket.getInputStream();
                     out      = socket.getOutputStream();
-                    buf_in   = new BufferedInputStream( in );
-                    buf_out  = new BufferedOutputStream( out );
-                    obj_in   = new ObjectInputStream( buf_in );
-                    obj_out  = new ObjectOutputStream( buf_out );
+                    in       = socket.getInputStream();
+                    obj_out  = new ObjectOutputStream( out );
+                    obj_out.flush();
+                    obj_in   = new ObjectInputStream( in );
                     
                     System.out.println("Client " + socket.getInetAddress() + "connected");
+                    
+                    listenMessages();
+                    
                 }catch( IOException e ){
                     e.printStackTrace();
                 }
@@ -110,17 +115,32 @@ public class SocketHandler {
         
         try{
             
+           System.out.println("Attempting connection to " + host + ":" + port);
+            
            socket = new Socket( host, port );
+           
+           System.out.println("Socket opened");
+           
            in       = socket.getInputStream();
            out      = socket.getOutputStream();
-           buf_in   = new BufferedInputStream( in );
-           buf_out  = new BufferedOutputStream( out );
-           obj_in   = new ObjectInputStream( buf_in );
-           obj_out  = new ObjectOutputStream( buf_out );
+           obj_out  = new ObjectOutputStream(out);
+           obj_out.flush();
+           obj_in   = new ObjectInputStream(in);
            
            System.out.println("Connected to "  +
                    socket.getInetAddress()+":" +
                    socket.getPort() );
+        
+           listenMessages();
+           
+           try{
+            Thread.sleep(1000);
+        }catch(Exception e){}
+           
+           //Send initial message
+           Message msg = new Message();
+           msg.setMessage("Hello partner");
+           sendMessage(msg);
            
         }catch( UnknownHostException e ){
             System.err.println("Host not found");
@@ -134,16 +154,21 @@ public class SocketHandler {
      * Listen to messages through socket
      */
     public void listenMessages(){
-        
-        if( socket != null && buf_in != null ){
+
+        if( socket != null && obj_in != null ){
+            System.out.println("asd");
             executor.submit( () -> {
                 while(true){
                     try{
                         Message temp;
-                        while( (temp = (Message)obj_in.readObject()) != null ){
+                        System.out.println("aa");
+                        temp = (Message)obj_in.readObject();
                             target.add(temp);
-                            System.out.println("Message received");
-                        }
+                            if( temp.getMessage() != null )
+                                System.out.println("Network message received: " + temp.getMessage());
+                            else
+                                System.out.println("Network message received");
+                        System.out.println("asdddd");
                     }catch( IOException e ){
                         e.printStackTrace();
                     }catch( ClassNotFoundException e ){
@@ -160,16 +185,38 @@ public class SocketHandler {
      * Send TCP message through socket
      * @param message Message to be sent to other player
      */
-    public void sendMessage( String message ){
+    public void sendMessage( Message message ){
         
-        if( socket == null || buf_out == null ) return;
-        if( pri_out == null ) pri_out = new PrintWriter( buf_out );
+        if( socket == null || obj_out == null ) return;
         
-        pri_out.println(message);
-        pri_out.flush();
+        try{
+           obj_out.writeObject(message);
+           obj_out.flush();
+           System.out.println("Message sent");
+        }catch(Exception e){
+            System.err.println("Error sending message");
+            e.printStackTrace();
+        }
         
-        System.out.println("Message sent");
-        
+    }
+
+    /**
+     * Shut down everything related to socket
+     */
+    public void closeConnection(){
+        try{
+            if( socket != null)         socket.close();
+            if( serverSocket != null )  serverSocket.close();
+            if( obj_in != null )        obj_in.close();
+            if( obj_out != null )       obj_out.close();
+            if( buf_in != null )        buf_in.close();
+            if( buf_out != null )       buf_out.close();
+            if( in != null )            in.close();
+            if( out != null )           out.close();
+        }catch(IOException e){
+            System.err.println("Error while closing socket");
+            e.printStackTrace();
+        }
     }
     
     @Override

@@ -15,6 +15,9 @@ public class Message implements Serializable{
     //Results of a move
     private LinkedList<Result> resultset;
     
+    //Additional string to send with this object
+    private String message;
+    
     public Message(){
         System.out.println("Message instance created");
         resultset = new LinkedList<>();
@@ -22,6 +25,18 @@ public class Message implements Serializable{
     
     public void setResultset( LinkedList<Result> results ){
         resultset = results;
+    }
+    
+    /**
+     * Set message string
+     * @param message String to accompany this object, used mostly for debugging
+     */
+    public void setMessage(String message){
+        this.message = message;
+    }
+    
+    public String getMessage(){
+        return message;
     }
     
     /**
